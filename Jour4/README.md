@@ -1,90 +1,111 @@
 # TP4 - Détection de fraude bancaire
 
-Projet de Machine Learning pour la détection de transactions frauduleuses sur des données bancaires anonymisées. Réalisé dans le cadre du Master 1 Data Engineering (Concepts et technologies IA).
+**Master 1 Data Engineering - YNOV Montpellier**  
+**Sujet : Détection de fraude sur transactions bancaires**
 
-## Objectifs
+---
 
-- Construire un modèle qui détecte au moins 85 % des fraudes (Recall >= 0.85).
-- Limiter les faux positifs (Precision la plus élevée possible).
-- Utiliser du feature engineering, gérer le déséquilibre des classes et optimiser les hyperparamètres.
+## Description
 
-## Structure du projet
+Ce projet réalise un système de détection de fraude à partir de transactions bancaires anonymisées. Il met en œuvre :
 
-```
-Jour4/
-├── README.md                 # Ce fichier
-├── requirements.txt          # Dépendances Python
-├── api_fraud_detection.py    # API Flask pour prédire en production
-├── SUJET_TP4_DETECTION_FRAUDE.md   # Sujet détaillé du TP
-├── AIDE_MEMOIRE.md           # Rappels techniques (syntaxe, formules)
-│
-├── data/
-│   ├── README_DATA.md        # Description du jeu de données
-│   ├── download_data.py      # Téléchargement du CSV depuis Kaggle
-│   └── creditcard.csv        # À télécharger (absent du dépôt, > 100 Mo)
-│
-├── notebooks/
-│   ├── TP4_Detection_Fraude_ETUDIANT.ipynb   # Notebook principal (EDA, modèles, optimisation)
-│   └── README_NOTEBOOK.md    # Instructions pour le notebook
-│
-├── utils/
-│   ├── feature_engineering.py # Création des features (temporel, montants, interactions)
-│   ├── predict.py            # Classe FraudDetector (chargement modèle, prédiction)
-│   └── __init__.py
-│
-├── tests/
-│   └── test_fraud_detector.py # Tests unitaires du détecteur
-│
-└── models/                   # Modèles sauvegardés (créé après entraînement)
-```
+- Analyse exploratoire et feature engineering (features temporelles, montants, interactions, agrégations)
+- Gestion du déséquilibre des classes (class_weight, SMOTE) et métriques adaptées (PR-AUC)
+- Comparaison de 6 algorithmes : régression logistique, arbre de décision, Random Forest, SVM, KNN, XGBoost
+- Optimisation des hyperparamètres (GridSearchCV, RandomizedSearchCV) et pipelines scikit-learn
+- Explicabilité : importance des variables (MDI, permutation, SHAP), courbes d’apprentissage, calibration
+- Déploiement : sérialisation du modèle (joblib), API Flask, tests unitaires
+
+Le jeu de données utilisé est le **Credit Card Fraud Detection** (Kaggle) : 284 807 transactions, 492 fraudes (environ 0,17 %), avec des variables PCA (V1–V28), Time et Amount.
+
+---
+
+## Prérequis
+
+- Python 3.8 ou supérieur
+- pip à jour
+
+Un environnement virtuel est recommandé mais pas obligatoire.
+
+---
 
 ## Installation
 
-### 1. Cloner le dépôt
+### 1. Cloner ou récupérer le projet
+
+Placer tous les fichiers du projet dans un même dossier (par exemple en clonant le dépôt puis en ouvrant le dossier **Jour4**).
+
+### 2. Installer les dépendances
+
+Ouvrir un terminal dans le dossier **Jour4** et exécuter :
 
 ```bash
-git clone https://github.com/MrSiuuu/Gestion-des-models.git
-cd Gestion-des-models
-```
-
-### 2. Environnement virtuel et dépendances
-
-```bash
-python -m venv venv
-venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-(Sur Linux/Mac : `source venv/bin/activate`.)
+En cas d’erreur liée à setuptools (par exemple sous Python 3.14), exécuter d’abord :
 
-### 3. Données
+```bash
+pip install --upgrade setuptools wheel
+```
 
-Le fichier `data/creditcard.csv` (environ 144 Mo) n’est pas présent sur GitHub (limite de taille). Deux possibilités :
+puis à nouveau :
 
-- **Automatique** : aller dans `data/` et lancer `python download_data.py` (nécessite un compte Kaggle et un token API).
-- **Manuel** : télécharger [Credit Card Fraud Detection](https://www.kaggle.com/mlg-ulb/creditcardfraud) sur Kaggle, puis placer `creditcard.csv` dans le dossier `data/`.
+```bash
+pip install -r requirements.txt
+```
 
-Voir `data/README_DATA.md` pour le détail.
+### 3. Vérifier l’installation
 
-## Utilisation
+```bash
+python -c "import sklearn, pandas, imblearn, xgboost, flask; print('OK')"
+```
 
-### Lancer le notebook
+Si aucun message d’erreur n’apparaît, l’environnement est prêt.
+
+---
+
+## Dataset
+
+Le notebook et l’API attendent le fichier **creditcard.csv** dans le dossier **data/**.
+
+- **Source :** [Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)
+- **Téléchargement manuel :** se connecter à Kaggle, télécharger le dataset, puis placer le fichier **creditcard.csv** dans le dossier **data/** du projet.
+- **Script automatique :** exécuter `python download_data.py` depuis le dossier **data/** (nécessite un compte Kaggle et un token API configuré).
+
+Le fichier fait environ 144 Mo et n’est pas fourni dans le dépôt (limite GitHub 100 Mo). Sans ce fichier, le notebook et l’API ne pourront pas charger les données.
+
+Voir **data/README_DATA.md** pour la structure des colonnes et les statistiques.
+
+---
+
+## Exécution du notebook principal
+
+### Lancer le TP (Parties 1 à 5)
+
+Dans un terminal, se placer dans le dossier **Jour4** puis exécuter :
 
 ```bash
 jupyter notebook notebooks/TP4_Detection_Fraude_ETUDIANT.ipynb
 ```
 
-Le notebook couvre : exploration, feature engineering, comparaison de 6 modèles (dont Random Forest et XGBoost), optimisation (GridSearch, RandomizedSearch), importance des variables (MDI, permutation, SHAP), courbes d’apprentissage, calibration, réglage du seuil, sauvegarde du modèle et validation temporelle.
+- **Partie 1 :** chargement des données, analyse du déséquilibre, corrélations, feature engineering (15+ features).
+- **Partie 2 :** préparation train/test, scaling (RobustScaler), entraînement et évaluation de 6 modèles (LR, DT, RF, SVM, KNN, XGBoost), comparaison SMOTE vs class_weight.
+- **Partie 3 :** pipeline ML, GridSearchCV et RandomizedSearchCV, optimisation XGBoost, validation (StratifiedKFold, TimeSeriesSplit).
+- **Partie 4 :** importance des variables (MDI, permutation, SHAP), courbes ROC et Precision-Recall, learning curves, calibration, optimisation du seuil de décision.
+- **Partie 5 :** validation temporelle, sérialisation du modèle (joblib), métadonnées.
 
-### Utiliser le modèle entraîné (API)
+Répondre aux questions dans les cellules markdown prévues à cet effet. À la fin de la Partie 5, le modèle est sauvegardé dans **models/fraud_detector_v1.joblib**.
 
-Après avoir exécuté le notebook et sauvegardé le modèle dans `models/` :
+### Lancer l’API (après entraînement)
+
+Une fois le modèle sauvegardé dans **models/** :
 
 ```bash
 python api_fraud_detection.py
 ```
 
-L’API écoute sur `http://localhost:5000`. Voir le code pour les endpoints (ex. prédiction par JSON).
+L’API écoute sur **http://localhost:5000**. Consulter le code pour les endpoints (prédiction par JSON).
 
 ### Lancer les tests
 
@@ -92,24 +113,50 @@ L’API écoute sur `http://localhost:5000`. Voir le code pour les endpoints (ex
 pytest tests/ -v
 ```
 
-## Données (résumé)
+---
 
-- **Source** : [Kaggle - Credit Card Fraud Detection](https://www.kaggle.com/mlg-ulb/creditcardfraud).
-- **Volume** : 284 807 transactions, 492 fraudes (environ 0,17 %).
-- **Variables** : `Time`, `V1` à `V28` (PCA), `Amount`, `Class` (0 = légitime, 1 = fraude).
+## Structure du projet
 
-Le déséquilibre est fort ; le TP utilise notamment `class_weight`, SMOTE et la métrique PR-AUC.
+```
+Jour4/
+|
+|-- README.md                         (ce fichier)
+|-- requirements.txt                  (dépendances Python)
+|-- api_fraud_detection.py            (API Flask pour prédiction)
+|-- SUJET_TP4_DETECTION_FRAUDE.md     (sujet détaillé du TP)
+|-- AIDE_MEMOIRE.md                   (rappels techniques)
+|
+|-- data/
+|   |-- README_DATA.md                (description du dataset)
+|   |-- download_data.py              (téléchargement Kaggle)
+|   |-- creditcard.csv                 (à télécharger, non fourni dans le dépôt)
+|
+|-- notebooks/
+|   |-- TP4_Detection_Fraude_ETUDIANT.ipynb   (notebook principal)
+|   |-- README_NOTEBOOK.md             (instructions notebook)
+|
+|-- utils/
+|   |-- feature_engineering.py        (création des features)
+|   |-- predict.py                    (classe FraudDetector)
+|   |-- __init__.py
+|
+|-- tests/
+|   |-- test_fraud_detector.py         (tests unitaires)
+|
+|-- models/                            (créé après entraînement)
+|   |-- fraud_detector_v1.joblib      (généré après exécution du notebook)
+```
 
-## Technologies
+---
 
-- Python 3.x
-- pandas, numpy, scikit-learn, imbalanced-learn, xgboost
-- Flask (API), joblib (sauvegarde des modèles), pytest (tests)
+## Livrables du TP
+
+- **TP4_Detection_Fraude_ETUDIANT.ipynb** : notebook complété (code + réponses aux questions).
+- **models/fraud_detector_v1.joblib** : pipeline de détection de fraude (scaler + modèle), généré en fin de Partie 5.
+- **README** : ce fichier, décrivant l’installation et l’exécution du projet.
+
+---
 
 ## Auteur
 
 KOUYATE Issa – Master 1 Data Engineering.
-
-## Licence
-
-Projet pédagogique. Voir le sujet du TP pour le cadre d’utilisation.
