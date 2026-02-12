@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+.venv/
+.env/
+
+# IDE
+.idea/
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Données volumineuses (limite GitHub 100 Mo)
+data/creditcard.csv
+
+# Fichiers MD générés pour explications / déploiement (ne pas envoyer)
+CE_QUE_LE_PROF_DEMANDE_TP4.md
+DEPLOYMENT_README.md

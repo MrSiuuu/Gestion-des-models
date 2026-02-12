@@ -1,0 +1,17 @@
+# Environnements et cache Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env/
+
+# IDE
+.idea/
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
