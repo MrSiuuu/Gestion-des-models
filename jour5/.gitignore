@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environnements virtuels
+venv/
+.venv/
+env/
+.env/
+
+# IDE / éditeurs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow (artefacts locaux, souvent volumineux)
+mlruns/
+mlflow.db
+mlflow.db-journal
+
+# Fichiers générés par le TP (ne pas versionner pour garder le dépôt léger)
+spam_detector_pipeline.pkl
+model_info_v1.json
+
+# Données (le CSV peut être lourd ou soumis à licence)
+# data/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs et temporaires
+*.log
+*.tmp
+.cache/
+
+# Fichiers MD générés pour explications (ne pas envoyer)
+PLAN_CORRECTION.md
